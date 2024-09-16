@@ -1,6 +1,5 @@
-import 'package:apna_weather_app/view/get_lat_long.dart';
-import 'package:apna_weather_app/view/home_screen.dart';
-import 'package:apna_weather_app/view/login_screen.dart';
+import 'package:apna_weather_app/view/forecast_screen/forecast_screen.dart';
+import 'package:apna_weather_app/view/home_screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -18,13 +17,14 @@ class MyApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize:const Size(360 , 800),
       builder: (_ ,child){
-      return MaterialApp(
-      theme: ThemeData(
+      return const MaterialApp(
+        debugShowCheckedModeBanner: false,
+      // theme: ThemeData(
 
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-        ),
-        home: const HomeScreen(),
+      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      //   useMaterial3: true,
+      //   ),
+        home: HomeScreen(),
        );
       },
     );
