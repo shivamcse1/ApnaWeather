@@ -1,5 +1,4 @@
-import 'package:apna_weather_app/view/forecast_screen/forecast_screen.dart';
-import 'package:apna_weather_app/view/home_screen/home_screen.dart';
+import 'package:apna_weather_app/view/bottom_nav_bar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -24,7 +23,7 @@ class MyApp extends StatelessWidget {
       //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       //   useMaterial3: true,
       //   ),
-        home: HomeScreen(),
+        home: BottomNavBarScreen(),
        );
       },
     );

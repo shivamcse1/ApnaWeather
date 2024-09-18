@@ -5,7 +5,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 class Uihelper {
 
    showFlutterToast(String message){
-
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
