@@ -3,7 +3,6 @@ import 'package:apna_weather_app/view/profile_screen/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'add_city_screen/add_city_screen.dart';
-import 'location_screen/location_screen.dart';
 
 class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({super.key});
@@ -26,12 +25,13 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
         body: bottomNavBarScreen[selectedIndex] ,
 
         bottomNavigationBar:  BottomNavigationBar(
-        selectedIconTheme: const IconThemeData(
-        color: Colors.blue,
-        ),
+
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.white,
-        unselectedLabelStyle: const TextStyle(fontSize: 14),
+        unselectedLabelStyle: const TextStyle(fontSize: 15),
+        selectedLabelStyle: const TextStyle(fontSize: 15),
+        
+        
         currentIndex: selectedIndex,
         onTap: (tapIndex) {
           setState(() {
@@ -53,10 +53,10 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
           label: "Weather"
           ),
 
-          BottomNavigationBarItem(
-          icon: Icon(Icons.manage_accounts,color: Colors.white,),
-          label: "Account"
-          ),
+          // BottomNavigationBarItem(
+          // icon: Icon(Icons.manage_accounts,color: Colors.white,),
+          // label: "Account"
+          // ),
           ]
         ),
     );

@@ -10,28 +10,27 @@ class ForecastScreen extends StatefulWidget {
 }
 
 class ForecastScreenState extends State<ForecastScreen> {
+  DateTime now = DateTime.now();
+  Map<String,dynamic> currentdata={};
+  List<dynamic> dailyForecasts =[];
+  List<dynamic> forecastList = [];
+  String date ='';
 
-  List<String> currentSky = [
-       "Cloudy",
-       "Thunderstrom",
-       "Few Clouds",
-       "Clear Sky",
-       "Rain",
-       "Mist",
-       "Snow",
-      //  "Haze"
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    currentdata = ModalRoute.of(context)!.settings.arguments as Map<String,dynamic>;
+    forecastList= currentdata["forecastData"]['list'];
 
-  ];
-  List<String> dayNames = [
-       "Sunday",
-       "Monday",
-       "Tuesday",
-       "Wednesday",
-       "Thursday",
-       "Friday",
-       "Saturday",
+    // Filter for 09:00 AM entries
+       dailyForecasts = forecastList.where((forecast) {
+       String dateTime = forecast['dt_txt'];
+       return dateTime.contains('09:00:00'); // Filter for 9 AM forecasts
+      }).toList();
 
-  ];
+      print("daily forecast ------$dailyForecasts");
+
+    }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,9 +39,7 @@ class ForecastScreenState extends State<ForecastScreen> {
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,
         colors: [
-          // Color.fromARGB(255, 165, 99, 178),
-          // Color.fromARGB(255, 53, 198, 196),
-        
+         
         Color.fromARGB(255, 104, 71, 142),
         Color.fromARGB(255, 132, 60, 163),
               
@@ -55,10 +52,7 @@ class ForecastScreenState extends State<ForecastScreen> {
          child: AppBar(
           backgroundColor: Colors.transparent,
           centerTitle: true,
-          title: Padding(
-                 padding: const EdgeInsets.only(bottom: 10),
-                 child: Text("7 Day Forecast",style: TextStyle(fontSize: 22.sp,color: Colors.yellow,fontWeight: FontWeight.bold),),
-               ), 
+          title: Text("5 Day Forecast",style: TextStyle(fontSize: 20.sp,color: Colors.yellow,fontWeight: FontWeight.w500),), 
           leading: IconButton(
           padding: const EdgeInsets.only(bottom: 10),
           onPressed:(){
@@ -69,6 +63,7 @@ class ForecastScreenState extends State<ForecastScreen> {
          ),
        ),
        body: SingleChildScrollView(
+        // physics: const NeverScrollableScrollPhysics(),
          child: Container(
            decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -101,7 +96,6 @@ class ForecastScreenState extends State<ForecastScreen> {
                        ),
                        borderRadius: BorderRadius.circular(16.r),
                        color: const Color(0xFF331868),
-                       // color: Color.fromARGB(255, 42, 156, 118),
              
                      ),
                      
@@ -129,16 +123,17 @@ class ForecastScreenState extends State<ForecastScreen> {
                                    crossAxisAlignment: CrossAxisAlignment.start,
                                    
                                    children: [
-                                     Text("Sunday",
+                                     Text("Today",
+                                      // DateFormat('EEEE').format(now),
                                      style: TextStyle(fontSize: 20.sp,color: Colors.white,),),
                                      
                                      const SizedBox(height: 10,),
-                                     const Text("25°C",
-                                     style: TextStyle(fontSize: 34,color: Colors.white,fontWeight: FontWeight.bold)
+                                     Text("${(currentdata["currentWeatherData"]['main']['temp']-273.15).toStringAsFixed(1)}°C",
+                                     style: const TextStyle(fontSize: 34,color: Colors.white,fontWeight: FontWeight.bold)
                                      ),
                                      const SizedBox(height: 10,),
                     
-                                     Text("Mostly Cloudy",
+                                     Text(currentdata["currentWeatherData"]['weather'][0]["main"],
                                       style: TextStyle(fontSize: 20.sp,color: Colors.white,),),
                                    ],
                                  ),
@@ -164,7 +159,7 @@ class ForecastScreenState extends State<ForecastScreen> {
                                      children: [
                                        Image.asset("assets/icons/wind_day_ic.gif",height: 40.h,),
                                         SizedBox(height: 8.h,),
-                                       Text("22 m/s",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                       Text("${currentdata['currentWeatherData']['wind']['speed']} m/s",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                        Text("Wind Speed",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                                        
                                      ],
@@ -180,7 +175,7 @@ class ForecastScreenState extends State<ForecastScreen> {
                                      
                                        Image.asset("assets/icons/atomosphericpressure_ic.png",height: 40.h,),
                                         SizedBox(height: 8.h,),
-                                       Text("22 hPa",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                       Text("${currentdata['currentWeatherData']['main']['pressure']} hPa",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                        Text("Atm Pressure",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                              
                                        
@@ -196,7 +191,7 @@ class ForecastScreenState extends State<ForecastScreen> {
                                      children: [
                                         Image.asset("assets/icons/humidity_day_ic.png",height: 40.h,),
                                         SizedBox(height: 8.h,),
-                                       Text("22%",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                       Text("${currentdata['currentWeatherData']['main']['humidity']}%",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                        Text("Humidity",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                                      ],
                                    ),
@@ -218,13 +213,19 @@ class ForecastScreenState extends State<ForecastScreen> {
                  physics: const NeverScrollableScrollPhysics(),
                  shrinkWrap: true,
                  itemBuilder: (context,index){
+                 
+                 // finding day name using date 
+                 DateTime dateTime = DateTime.parse(dailyForecasts[index]["dt_txt"]); 
+                 int weekDay = dateTime.weekday;
+                 String dayNames = getWeekDayName(weekDay);
+
                  return SizedBox(
                    height: 70.h,
                    child: Row(
                      children: [
                        SizedBox(
                          width: 95.h,
-                         child: Text(dayNames[index],
+                         child: Text(dayNames,
                           style: TextStyle(fontSize: 15.sp,color: Colors.white),
                          ),
                        ),
@@ -237,20 +238,22 @@ class ForecastScreenState extends State<ForecastScreen> {
                        ),
                        
                        SizedBox(width: 5.w,),
-                        Text(currentSky[index],
+                        Text(dailyForecasts[index]['weather'][0]['main'],
                         style: TextStyle(fontSize: 15.sp,color: Colors.white),
                        ),
                  
                        const Spacer(),
                  
-                       Text("35°C / 40°C",
+                       Text("${(dailyForecasts[index]['main']['temp_min']-273.15).toStringAsFixed(1)}°C /"
+                       
+                        '${(dailyForecasts[index]['main']['temp_max']-273.15).toStringAsFixed(0)}°C',
                         style: TextStyle(fontSize: 15.sp,color: Colors.white),
                        ),
                      ],
                    ),
                  );
                },
-               itemCount: 7,
+               itemCount: dailyForecasts.length,
                ),
                   
                SizedBox(height: 30.h,)
@@ -258,9 +261,32 @@ class ForecastScreenState extends State<ForecastScreen> {
                     ],
                    ),
            ),
+                ),
        ),
-             ),
             ),
     );
+  }
+
+  String getWeekDayName(int weekDays){
+
+    switch(weekDays){
+
+      case 1 :
+      return 'Monday';
+      case 2 :
+      return 'Tuesday';
+      case 3 :
+      return 'Wednesday';
+      case 4 :
+      return 'Thursday';
+      case 5 :
+      return 'Friday';
+      case 6 :
+      return 'Saturday';
+      case 7 :
+      return 'Sunday';
+      default :
+      return "Invalid Day";
+    }
   }
 }

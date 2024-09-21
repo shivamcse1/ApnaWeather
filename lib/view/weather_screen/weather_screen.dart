@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'package:apna_weather_app/view/forecast_screen/forecast_screen.dart';
+import 'package:apna_weather_app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -14,75 +15,64 @@ class WeatherScreen extends StatefulWidget {
 }
 
 class WeatherScreenState extends State<WeatherScreen> {
-  TextEditingController cityController = TextEditingController();
-  TextEditingController locationController = TextEditingController();
   DateTime now = DateTime.now();
-  
-  bool isLoading = true;
+  double lat=0;
+  double lang=0;
   String cityName="Lucknow";
+  bool isLoading = true;
   final String apiKey="a14e6dfcf36384aed661d1131ac9eba2";
-  double windSpeed=0;
-  double currentTemp=0; 
-  String currentSkyCondition="";
-  String currentSkyConditionDescription="";
-  int atmPressure=0; 
-  int humidity =0;
-  int cloud =0;
-  String placeName="";
+  Map<String,dynamic> currentWeatherData={};
+  Map<String,dynamic> forecastData={};
+  String countryName='';
+  String forecastStartTime ='';
 
-  Future<void> getWeather () async {
 
+  Future<void> getCurrentWeather (String? locationName) async {
     try{
-        String apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$apiKey";
-        Uri weatherUriUrl = Uri.parse(apiUrl);
+        String weatherApiUrl = "https://api.openweathermap.org/data/2.5/weather?q=$locationName&appid=$apiKey";
+        String forecastApiUrl = "https://api.openweathermap.org/data/2.5/forecast?q=$locationName&appid=$apiKey";
+        Uri weatherUriUrl = Uri.parse(weatherApiUrl);
+        Uri forecastUriUrl = Uri.parse(forecastApiUrl);
+
         var weatherResponse = await http.get(weatherUriUrl);
-        if(weatherResponse.statusCode==200){
-          final data = jsonDecode(weatherResponse.body);
+        var forecastResponse = await http.get(forecastUriUrl);
+        
+        if(weatherResponse.statusCode==200 && forecastResponse.statusCode==200){
+           currentWeatherData = jsonDecode(weatherResponse.body);
+           forecastData = jsonDecode(forecastResponse.body);
+           // ignore: avoid_print
+           print('current weathr data----------$currentWeatherData');
+           // ignore: avoid_print
+           print('5 day forecast data----------$forecastData');
            
            setState(() {
-             
-             currentTemp = (data["main"]["temp"]-273.15);
-             currentSkyCondition = data["weather"][0]["main"];
-
              isLoading=false;
-             currentSkyConditionDescription = data["weather"][0]["description"];
-            //  cloud = data["clouds"]["all"];
-             windSpeed = data["wind"]["speed"];
-             humidity = data["main"]["humidity"];
-             atmPressure = data["main"]["pressure"];
+             countryName =", ${currentWeatherData["sys"]["country"]}";
            });
         }
-        else{
-          print("Error Occured");
+        else if(weatherResponse.statusCode==404 || forecastResponse.statusCode==404){
+               currentWeatherData = jsonDecode(weatherResponse.body);
+               setState(() {
+                 isLoading=false;
+               });
         }
-      String forcastApiUrl ="api.openweathermap.org/data/2.5/forecast?q=$cityName&appid=$apiKey";
-      Uri forcastUriUrl = Uri.parse(forcastApiUrl);
-
-     var forcastResponse = await http.get(forcastUriUrl);
-     if(forcastResponse.statusCode==200){
-      final forcastData = jsonDecode(forcastResponse.body);
-      print(forcastData);
-     }
-     else{
-
-      print("error occured in forcast");
-     }
-
-
     }
     catch(e){
-      print(e);
+      Exception("Error Occured : $e");
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getWeather();
+   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    cityName=ModalRoute.of(context)?.settings.arguments as String;
+    getCurrentWeather(cityName);
   }
 
   @override
   Widget build(BuildContext context) {
+    
     return Container(
             decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -101,11 +91,13 @@ class WeatherScreenState extends State<WeatherScreen> {
            backgroundColor: const Color.fromARGB(0, 169, 161, 161),
            appBar: PreferredSize(
             preferredSize: const Size(0, 30),
-             child: AppBar(
+             child:AppBar(
+           
              leading:IconButton(
               padding: const EdgeInsets.only(bottom: 10),
-              onPressed: (){
-             
+              onPressed: () async{
+                getCurrentLocation();
+                
              }, 
              icon: const Icon(Icons.location_on,
              color: Colors.white,
@@ -113,16 +105,20 @@ class WeatherScreenState extends State<WeatherScreen> {
              ) ,
              backgroundColor: Colors.transparent,
              centerTitle: true,
-             title:Padding(
-               padding: const EdgeInsets.only(bottom: 10),
-               child: Text("Lucknow",style: TextStyle(fontSize: 24.sp,color: Colors.yellow,fontWeight: FontWeight.bold),),
-             ),  
+             title:Text("${cityName[0].toUpperCase()+cityName.substring(1)}$countryName",
+             style: TextStyle(fontSize: 20.sp,color: Colors.yellow,fontWeight: FontWeight.w500),),  
 
              actions: [
-              IconButton(
+
+              currentWeatherData["cod"] == "404" 
+              ? const SizedBox(height: 1,width: 1,)
+              : IconButton(
                 padding: const EdgeInsets.only(bottom: 10),
-               onPressed:(){
-              
+                onPressed:() async{
+                   setState(() {
+                      isLoading=true;
+                   });
+                   getCurrentWeather(cityName);
               }, 
               icon: const Icon(Icons.refresh,
               color: Colors.white,
@@ -149,27 +145,46 @@ class WeatherScreenState extends State<WeatherScreen> {
               color: Colors.amberAccent,
              ) ,) 
             
-            :Padding(
+            :
+            currentWeatherData["cod"] == "404" 
+            ? SizedBox(
+              height: 650,
+              child:Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                      
+                      Image.asset("assets/icons/nocity2_ic.png",
+                      height: 75,),
+                      SizedBox(height: 5.h,),
+                      Text("Oops! City Not Found ",
+                        style: TextStyle(fontSize: 18.sp,color: Colors.white,
+                        fontWeight: FontWeight.w500
+        
+                        ),
+                      )
+                        ],
+                      ),
+                    )
+                  )
+            : Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: SingleChildScrollView(
                 child: Column(
                  children: [
                      
-                      
                      // -------------Weather Section------------// 
-      
-                     
                      SizedBox(height: 20.h,),   
                      SizedBox(
                        width: double.infinity,
                        child: Column(
                          children: [
                
-                           Text(currentSkyCondition,
+                           Text(currentWeatherData["weather"][0]["main"],
                            style: TextStyle(fontSize: 24.sp,color: Colors.white),),
-                             Text("${currentTemp.toStringAsFixed(1)}°C",
+                             Text("${(currentWeatherData["main"]["temp"]-273.15).toStringAsFixed(1)}°C",
                            style: TextStyle(
-                             fontSize: 35.sp,
+                             fontSize: 34.sp,
                              fontWeight: FontWeight.bold,
                              color: Colors.white
                            ),
@@ -204,7 +219,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                              ],
                            ),
                
-                           Text("Feels Like 23°C",style:TextStyle(fontSize: 16.sp,color: Colors.white)),
+                           Text("Feels Like ${(currentWeatherData["main"]["feels_like"]-273.15).toStringAsFixed(1)}°C",style:TextStyle(fontSize: 16.sp,color: Colors.white)),
                            
                          ],
                        ),
@@ -214,7 +229,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                      // -------------Weather Details Section------------// 
                      Container(
                        alignment: Alignment.centerLeft,
-                       child:   Text("Weather Details",style: TextStyle(fontSize: 20.sp,color: Colors.yellow,fontWeight: FontWeight.bold),),   
+                       child:   Text("Weather Details",style: TextStyle(fontSize: 20.sp,color: Colors.yellow,fontWeight: FontWeight.w500),),   
                      ),
                      SizedBox(height: 10.h,),
                
@@ -258,7 +273,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                        children: [
                                          Image.asset("assets/icons/wind_day_ic.gif",height: 40.h,),
                                           SizedBox(height: 8.h,),
-                                         Text("22 m/s",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                         Text("${currentWeatherData["wind"]["speed"]} m/s",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Wind Speed",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                                
                                          
@@ -275,7 +290,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                        
                                          Image.asset("assets/icons/atomosphericpressure_ic.png",height: 40.h,),
                                           SizedBox(height: 8.h,),
-                                         Text("22 hPa",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                         Text("${currentWeatherData["main"]["pressure"]} hPa",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Atm Pressure",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                                
                                          
@@ -291,7 +306,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                        children: [
                                           Image.asset("assets/icons/humidity_day_ic.png",height: 40.h,),
                                           SizedBox(height: 8.h,),
-                                         Text("22%",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                         Text("${currentWeatherData["main"]["humidity"]}%",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Humidity",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                                        ],
                                      ),
@@ -316,7 +331,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                        children: [
                                          Image.asset("assets/icons/min_temp2_ic.png",height: 40.h,),
                                           SizedBox(height: 8.h,),
-                                         Text("32°C",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                         Text("${(currentWeatherData["main"]["temp_min"]-273.15).toStringAsFixed(2)}°C",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Min Temp.",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                                          
                                        ],
@@ -332,7 +347,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                        
                                          Image.asset("assets/icons/max_temp_ic.png",height: 40.h,),
                                           SizedBox(height: 8.h,),
-                                         Text("38°C",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                         Text("${(currentWeatherData["main"]["temp_max"]-273.15).toStringAsFixed(1)}°C",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Max Temp.",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                                
                                          
@@ -348,7 +363,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                        children: [
                                           Image.asset("assets/icons/cloud_ic.png",height: 40.h,),
                                           SizedBox(height: 8.h,),
-                                         Text("22%",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
+                                         Text("${currentWeatherData["clouds"]["all"]}%",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Cloudiness",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
                                        ],
                                      ),
@@ -371,7 +386,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                
                        Container(
                        alignment: Alignment.centerLeft,
-                       child:Text("Today",style: TextStyle(fontSize: 20.sp,color: Colors.yellow,fontWeight: FontWeight.bold),),   
+                       child:Text("Today",style: TextStyle(fontSize: 20.sp,color: Colors.yellow,fontWeight: FontWeight.w500),),   
                         ),
                
                        const Spacer(),
@@ -386,20 +401,32 @@ class WeatherScreenState extends State<WeatherScreen> {
                          ),
                          onPressed:(){
                          
-                         Navigator.push(context, MaterialPageRoute(builder: (context)=>const ForecastScreen()));
+                         Navigator.pushNamed(context, AppRoutes.forecastScreen,arguments: {
+                          "forecastData":forecastData,
+                          "currentWeatherData":currentWeatherData
+                         });
                         }, 
-                       child:Text("Next 7 days >",style: TextStyle(fontSize: 16.sp,color: Colors.white,fontWeight: FontWeight.bold),) 
+                       child:Text("Next 5 days >",style: TextStyle(fontSize: 16.sp,color: Colors.yellow,fontWeight: FontWeight.bold),) 
                        ),
                        ],
                      ),
                      SizedBox(height: 10.h,),
-                          
+                     Align(
+                     alignment: Alignment.centerLeft,
+                     child: Text("Next 24 Hours",style: TextStyle(fontSize: 16.sp,color: Colors.yellow,fontWeight: FontWeight.bold),)) ,
+                     SizedBox(height: 10.h,),    
                      SizedBox(
                      height: 120.h,
                       child: ListView.builder(
-                       itemCount: 4,
+                       itemCount: 9,
                        scrollDirection: Axis.horizontal,
-                       itemBuilder: (context,index){
+                       itemBuilder: (context,index){                          
+                        
+                       forecastStartTime = forecastData['list'][index]['dt_txt'];
+                       DateTime dateTime = DateTime.parse(forecastStartTime);
+
+                       String currentForecastTime = DateFormat('hh:mm a').format(dateTime);
+
                        return Container(
                        padding: const EdgeInsets.only(right: 3),
                        width: 100.w,
@@ -410,7 +437,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                            margin: const EdgeInsets.only(top: 5),
                            child:Column(
                              children: [
-                               Text("12 AM",
+                               Text(currentForecastTime,
                                style: TextStyle(
                                  fontSize: 14.sp,
                                  color: Colors.white,
@@ -421,7 +448,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                Icon(Icons.wb_sunny,size: 32.sp,color: Colors.orange,),
                                SizedBox(height: 8.h,),
                                         
-                               Text("26°C",
+                               Text('${(forecastData["list"][index]['main']['temp']-273.15).toStringAsFixed(2)}°C',
                                style: TextStyle(
                                  fontSize: 14.sp,
                                  color: Colors.white, 
@@ -437,59 +464,6 @@ class WeatherScreenState extends State<WeatherScreen> {
                      ),
                     ),
                     SizedBox(height: 25.h,),
-                          
-                     SizedBox(
-                       width: double.infinity,
-                       child: ElevatedButton(
-                       style: ElevatedButton.styleFrom(
-                         backgroundColor: Colors.blue,
-                         shape: RoundedRectangleBorder(
-                           borderRadius: BorderRadius.circular(8.sp)
-                         )
-                       ),
-                       onPressed: (){
-                          showDialog(context: context, 
-                          builder: (context){
-                           return  AlertDialog(
-                               
-                               title: const Text("Search City"),
-                          
-                               content: TextFormField(
-                                 controller: cityController,
-                                 decoration: const InputDecoration(
-                                   hintText: "Enter City Name",
-                                 ),
-                                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z]'))],
-                               
-                               ),
-                               actions: [
-                                 TextButton(onPressed:(){
-                                  Navigator.pop(context);
-                                 }, 
-                                 child: Text("Cancel",style: TextStyle(fontSize: 16.sp),)),
-                                
-                                 TextButton(onPressed:() async{
-                                 setState(() {
-                                  isLoading=true;
-                                  cityName=cityController.text;
-                                 
-                                 });
-                                 Navigator.pop(context);
-                                 await getWeather(); 
-                                 
-                                  
-                                 }, 
-                                 child: Text("Search",style: TextStyle(fontSize: 16.sp),)),
-                               ],
-                          
-                            );
-                           }
-                         );
-                       },
-                       child:Text("Change City",
-                       style: TextStyle(fontSize: 16.sp,fontWeight: FontWeight.w500,color: Colors.white),) 
-                       ,),
-                     ),
                  ],
                ),
              ),
@@ -500,5 +474,34 @@ class WeatherScreenState extends State<WeatherScreen> {
            
       ),
     );
+  }
+
+  void getCurrentLocation() async{
+    
+    // check device location enable or not 
+    bool serviceEnable ;
+    serviceEnable = await Geolocator.isLocationServiceEnabled();
+    if(!serviceEnable){
+       await Geolocator.openLocationSettings();
+       return ;
+    }
+    
+    //if enable then proceed 
+    LocationPermission permission = await Geolocator.checkPermission();
+    if(permission == LocationPermission.denied){
+        LocationPermission askAgain = await Geolocator.requestPermission();
+        if(askAgain==LocationPermission.denied || askAgain==LocationPermission.deniedForever){
+          return ;
+        }
+    }
+    else if(permission ==LocationPermission.deniedForever){
+      return ;
+    }
+    else{
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      lang=position.longitude;
+      lat= position.latitude;
+    }
+
   }
 }
