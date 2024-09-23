@@ -1,4 +1,4 @@
-import 'package:apna_weather_app/routes/app_routes.dart';
+import 'package:apna_weather_app/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,7 +11,7 @@ class AddCityScreen extends StatefulWidget {
 }
 
 class AddCityScreenState extends State<AddCityScreen> {
-  TextEditingController cityController  = TextEditingController();
+  TextEditingController cityNameController  = TextEditingController();
   List<String> cityNameList = [];
   String? cityNameRecieved ;
   
@@ -68,7 +68,39 @@ class AddCityScreenState extends State<AddCityScreen> {
                     height: 20.h,
                   ),
 
-                
+                //-------------Search Bar --------------//
+                Container(
+                height: 50.h,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: const Color(0xFF331868),
+                    borderRadius: BorderRadius.circular(8.sp)),
+                child: TextFormField(
+                       onFieldSubmitted: (inputValue){
+                        Navigator.pushNamed(context, AppRoutes.weatherScreen,arguments: inputValue);
+                        cityNameController.clear();
+                    },  
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(('[a-z A-Z]')))],
+                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                    controller: cityNameController,
+                    decoration: InputDecoration(
+                    
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.only(top:3.2),
+                        child: Icon(Icons.search,color: Colors.white,),
+                      ),
+                        contentPadding:
+                            EdgeInsets.only(top: 3.0.h, left: 20.w),
+                        hintText: "Enter Your City Name",
+                        hintStyle:
+                            TextStyle(color: Colors.white, fontSize: 14.sp),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(8.0.sp))
+                            )
+                            ),
+                          ),
+                  SizedBox(height: 20.h,),
                   //-------------Card Part  --------------//
                   cityNameList.isEmpty 
                   ? SizedBox(
@@ -277,12 +309,23 @@ class AddCityScreenState extends State<AddCityScreen> {
             onPressed: () async{
               
               // recieving data from next screen wait until data is not recieved
-             cityNameRecieved= await Navigator.pushNamed(context,AppRoutes.searchScreen) as String;
-             setState(() {
-              (cityNameRecieved =="" || cityNameRecieved == "null") ? const SizedBox(height: 1,width: 1,)
-              :cityNameList.add(cityNameRecieved![0].toUpperCase()+cityNameRecieved!.substring(1));
-               
-             });
+             final argument = await Navigator.pushNamed(context,AppRoutes.searchScreen);
+
+             if(argument is String){
+                 
+                 if(argument.isEmpty){
+                   return ;
+                 }
+                 else{
+                  setState(() {
+                    cityNameRecieved = argument;
+                    cityNameList.add(cityNameRecieved![0].toUpperCase()+cityNameRecieved!.substring(1));
+                  });
+                 }
+             }
+             else{
+               return;
+             }
             },
             child: const Icon(Icons.add,
             color: Colors.yellow,

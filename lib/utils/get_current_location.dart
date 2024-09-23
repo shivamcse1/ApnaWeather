@@ -1,4 +1,4 @@
-import 'package:apna_weather_app/utils/uihelper/toast_message.dart';
+import 'package:apna_weather_app/utils/uihelper/toast_message_helper.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -6,6 +6,7 @@ class GetCurrentLocation {
 
   double lat = 0;
   double lang = 0;
+  // ignore: non_constant_identifier_names
   String Address ='';
 
 
@@ -34,11 +35,11 @@ class GetCurrentLocation {
       LocationPermission askpermission = await Geolocator.requestPermission();
 
       if (askpermission == LocationPermission.denied) {
-        Uihelper().showFlutterToast("Location Permission Denied");
+        Toasthelper.showFlutterToast("Location Permission Denied");
         return;
       }
     } else if (permission == LocationPermission.deniedForever) {
-      Uihelper().showFlutterToast("Location Permission Denied Forever");
+      Toasthelper.showFlutterToast("Location Permission Denied Forever");
       return;
     } else {
       Position position = await Geolocator.getCurrentPosition(

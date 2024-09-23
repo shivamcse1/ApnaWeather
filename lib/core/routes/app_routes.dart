@@ -1,12 +1,11 @@
-import 'package:apna_weather_app/view/add_city_screen/add_city_screen.dart';
-import 'package:apna_weather_app/view/bottom_nav_bar_screen.dart';
-import 'package:apna_weather_app/view/forecast_screen/forecast_screen.dart';
-import 'package:apna_weather_app/view/location_screen/location_screen.dart';
-import 'package:apna_weather_app/view/login_screen.dart';
-import 'package:apna_weather_app/view/profile_screen/profile_screen.dart';
-import 'package:apna_weather_app/view/search_screen/search_screen.dart';
-import 'package:apna_weather_app/view/splash_screen.dart';
-import 'package:apna_weather_app/view/weather_screen/weather_screen.dart';
+import 'package:apna_weather_app/presentation/view/add_city_screen/add_city_screen.dart';
+import 'package:apna_weather_app/presentation/view/bottom_nav_bar_screen.dart';
+import 'package:apna_weather_app/presentation/view/forecast_screen/forecast_screen.dart';
+import 'package:apna_weather_app/presentation/view/login_screen.dart';
+import 'package:apna_weather_app/presentation/view/profile_screen/profile_screen.dart';
+import 'package:apna_weather_app/presentation/view/search_screen/search_screen.dart';
+import 'package:apna_weather_app/presentation/view/splash_screen.dart';
+import 'package:apna_weather_app/presentation/view/weather_screen/weather_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes{
@@ -19,7 +18,6 @@ class AppRoutes{
   static const String weatherScreen = '/weatherScreen';
   static const String profileScreen = 'profileScreen';
   static const String addCityScreen = '/addCityScreen';
-  static const String locationScreen = '/locationScreen';
   static const String searchScreen = '/searchScreen';
 
 
@@ -32,7 +30,6 @@ class AppRoutes{
       '/loginScreen' :(context)=> const LoginScreen(),
       '/addCityScreen' :(context)=> const AddCityScreen(),
       '/forecastScreen' :(context)=> const ForecastScreen(),
-      '/locationScreen':(context) => const LocationScreen(),
       '/profileScreen':(context)=> const ProfileScreen(),
       '/weatherScreen' :(context)=> const WeatherScreen(),
       '/searchScreen' :(context)=> const SearchScreen(),
@@ -66,9 +63,6 @@ class AppRoutes{
 
       case addCityScreen:
       return MaterialPageRoute(builder: (context) =>const AddCityScreen());
-
-      case locationScreen:
-      return MaterialPageRoute(builder: (context) =>const LocationScreen());
 
       case searchScreen:
       return MaterialPageRoute(builder: (context) =>const SearchScreen());

@@ -2,17 +2,18 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class Uihelper {
+class Toasthelper {
 
-   showFlutterToast(String message){
+   static showFlutterToast(String message){
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 2,
+        backgroundColor: const Color(0xFF331868),
         textColor: Colors.white,
-        fontSize: 16.0
+        fontSize: 16.0,
+        
     );
 
    }

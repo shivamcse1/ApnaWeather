@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'package:apna_weather_app/routes/app_routes.dart';
+import 'dart:developer';
+import 'package:apna_weather_app/data/services/current_location_service.dart';
+import 'package:apna_weather_app/core/routes/app_routes.dart';
+import 'package:apna_weather_app/utils/uihelper/api_url_helper.dart';
+import 'package:apna_weather_app/utils/uihelper/city_not_found_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -16,34 +18,32 @@ class WeatherScreen extends StatefulWidget {
 
 class WeatherScreenState extends State<WeatherScreen> {
   DateTime now = DateTime.now();
-  double lat=0;
-  double lang=0;
-  String cityName="Lucknow";
+  String cityName="";
   bool isLoading = true;
-  final String apiKey="a14e6dfcf36384aed661d1131ac9eba2";
   Map<String,dynamic> currentWeatherData={};
   Map<String,dynamic> forecastData={};
   String countryName='';
   String forecastStartTime ='';
 
-
-  Future<void> getCurrentWeather (String? locationName) async {
+  Future<void> getCurrentWeather ({String? locationName, double? latitude, double? longitude } ) async {
+    Map<String,String> urlMap={};
+    locationName==null 
+    ? urlMap = WeatherHelper.getUrlByLatLong(lat: latitude!, long: longitude!)
+    : urlMap = WeatherHelper.getUrlByCityName(cityName:locationName);
+  
     try{
-        String weatherApiUrl = "https://api.openweathermap.org/data/2.5/weather?q=$locationName&appid=$apiKey";
-        String forecastApiUrl = "https://api.openweathermap.org/data/2.5/forecast?q=$locationName&appid=$apiKey";
-        Uri weatherUriUrl = Uri.parse(weatherApiUrl);
-        Uri forecastUriUrl = Uri.parse(forecastApiUrl);
-
+       
+        Uri weatherUriUrl = Uri.parse(urlMap['currentWeather']!);
+        Uri forecastUriUrl = Uri.parse(urlMap['forecast']!);
+        
         var weatherResponse = await http.get(weatherUriUrl);
         var forecastResponse = await http.get(forecastUriUrl);
         
         if(weatherResponse.statusCode==200 && forecastResponse.statusCode==200){
            currentWeatherData = jsonDecode(weatherResponse.body);
            forecastData = jsonDecode(forecastResponse.body);
-           // ignore: avoid_print
-           print('current weathr data----------$currentWeatherData');
-           // ignore: avoid_print
-           print('5 day forecast data----------$forecastData');
+          //  log('current weathr data----------$currentWeatherData');
+          //  log('5 day forecast data----------$forecastData');
            
            setState(() {
              isLoading=false;
@@ -58,7 +58,7 @@ class WeatherScreenState extends State<WeatherScreen> {
         }
     }
     catch(e){
-      Exception("Error Occured : $e");
+      log("Error Occured : $e");
     }
   }
 
@@ -66,13 +66,31 @@ class WeatherScreenState extends State<WeatherScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     
-    cityName=ModalRoute.of(context)?.settings.arguments as String;
-    getCurrentWeather(cityName);
+    final argument = ModalRoute.of(context)?.settings.arguments;
+    if(argument is String){
+       if(argument.isEmpty)
+       {
+         
+          setState(() {
+             cityName=argument;
+             isLoading=false;
+          });
+          return ;
+       }
+       else{
+          cityName = argument;
+          getCurrentWeather(locationName: cityName);
+       }
+      
+    }else{
+      cityName="Lucknow";
+      getCurrentWeather(locationName: cityName);
+    }
+    
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Container(
             decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -96,8 +114,16 @@ class WeatherScreenState extends State<WeatherScreen> {
              leading:IconButton(
               padding: const EdgeInsets.only(bottom: 10),
               onPressed: () async{
-                getCurrentLocation();
-                
+                setState(() {
+                  isLoading=true;
+                });
+               
+               var data = await LocationService.getCurrentLocation();
+               data['latitude']== null 
+               ? setState(() {
+                 isLoading=false;
+                })
+               : await getCurrentWeather(latitude: data["latitude"],longitude: data['longitude']);
              }, 
              icon: const Icon(Icons.location_on,
              color: Colors.white,
@@ -105,12 +131,22 @@ class WeatherScreenState extends State<WeatherScreen> {
              ) ,
              backgroundColor: Colors.transparent,
              centerTitle: true,
-             title:Text("${cityName[0].toUpperCase()+cityName.substring(1)}$countryName",
+             title:
+             cityName.isEmpty 
+             ? const SizedBox(height: 1,width: 1,)
+
+             :
+              Text(
+               currentWeatherData["name"] == null
+
+               ? "${cityName[0].toUpperCase()+cityName.substring(1)}$countryName"
+               : "${currentWeatherData["name"][0].toUpperCase()+currentWeatherData["name"].substring(1)}$countryName",
+             
              style: TextStyle(fontSize: 20.sp,color: Colors.yellow,fontWeight: FontWeight.w500),),  
 
              actions: [
 
-              currentWeatherData["cod"] == "404" 
+              currentWeatherData["cod"] == "404" || cityName.isEmpty
               ? const SizedBox(height: 1,width: 1,)
               : IconButton(
                 padding: const EdgeInsets.only(bottom: 10),
@@ -118,7 +154,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                    setState(() {
                       isLoading=true;
                    });
-                   getCurrentWeather(cityName);
+                   getCurrentWeather(locationName: cityName);
               }, 
               icon: const Icon(Icons.refresh,
               color: Colors.white,
@@ -141,32 +177,22 @@ class WeatherScreenState extends State<WeatherScreen> {
               ]),
              ),
       
-             child:isLoading? const Center(child:CircularProgressIndicator(
-              color: Colors.amberAccent,
-             ) ,) 
+             child:isLoading? Center(
+               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(color: Colors.yellow,),
+                  SizedBox(height: 8.h,),
+                  Text('Please Wait....',style:TextStyle(color: Colors.white,fontSize: 16.sp) ,)
+                ],
+               ),
+             )
             
             :
             currentWeatherData["cod"] == "404" 
-            ? SizedBox(
-              height: 650,
-              child:Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                      
-                      Image.asset("assets/icons/nocity2_ic.png",
-                      height: 75,),
-                      SizedBox(height: 5.h,),
-                      Text("Oops! City Not Found ",
-                        style: TextStyle(fontSize: 18.sp,color: Colors.white,
-                        fontWeight: FontWeight.w500
-        
-                        ),
-                      )
-                        ],
-                      ),
-                    )
-                  )
+            ? CityNotFound.cityNotFound()
+            : cityName.isEmpty 
+            ? CityNotFound.cityNotFound(msg: "Invalid City Name")
             : Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: SingleChildScrollView(
@@ -475,33 +501,5 @@ class WeatherScreenState extends State<WeatherScreen> {
       ),
     );
   }
-
-  void getCurrentLocation() async{
-    
-    // check device location enable or not 
-    bool serviceEnable ;
-    serviceEnable = await Geolocator.isLocationServiceEnabled();
-    if(!serviceEnable){
-       await Geolocator.openLocationSettings();
-       return ;
-    }
-    
-    //if enable then proceed 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if(permission == LocationPermission.denied){
-        LocationPermission askAgain = await Geolocator.requestPermission();
-        if(askAgain==LocationPermission.denied || askAgain==LocationPermission.deniedForever){
-          return ;
-        }
-    }
-    else if(permission ==LocationPermission.deniedForever){
-      return ;
-    }
-    else{
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      lang=position.longitude;
-      lat= position.latitude;
-    }
-
-  }
+ 
 }

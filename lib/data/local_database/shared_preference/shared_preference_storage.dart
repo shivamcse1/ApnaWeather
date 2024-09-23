@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPreference {
+class LocalSharedPrefrence {
 
  
  //------------create or insert data in the local Storage-------------//
