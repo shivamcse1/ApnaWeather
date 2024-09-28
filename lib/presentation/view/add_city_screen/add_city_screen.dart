@@ -1,3 +1,4 @@
+import 'package:apna_weather_app/core/constants/image_const.dart';
 import 'package:apna_weather_app/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -77,7 +78,7 @@ class AddCityScreenState extends State<AddCityScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                            
-                            Image.asset("assets/icons/nocity3_ic.png",
+                            Image.asset(ImageConst.noCityFound2Img,
                             height: 80,),
                             SizedBox(height: 5.h,),
                             Text("No City Added",
@@ -187,7 +188,7 @@ class AddCityScreenState extends State<AddCityScreen> {
                                                 Row(
                                                   children: [
                                                   Image.asset(
-                                                    "assets/icons/min_temp2_ic.png",
+                                                    ImageConst.minTempIc,
                                                     height: 18.h,
                                                   ),
                                                     
@@ -233,7 +234,7 @@ class AddCityScreenState extends State<AddCityScreen> {
                                                   MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Image.asset(
-                                                  "assets/icons/cloud_ic.png",
+                                                  ImageConst.cloudImg,
                                                   width: 80.h,
                                                 ),
                                                 SizedBox(

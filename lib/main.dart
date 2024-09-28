@@ -1,11 +1,14 @@
 import 'package:apna_weather_app/core/routes/app_routes.dart';
+import 'package:apna_weather_app/data/local_database/shared_preference/shared_preference_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 //Global Navigator key (used when you want to navigate without context)
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await LocalDataBasePrefs().init();
   runApp(const MyApp());
 }
 

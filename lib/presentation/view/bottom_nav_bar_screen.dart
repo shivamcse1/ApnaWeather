@@ -1,6 +1,5 @@
 import 'package:apna_weather_app/presentation/view/search_screen/search_screen.dart';
 import 'package:apna_weather_app/presentation/view/weather_screen/weather_screen.dart';
-import 'package:apna_weather_app/presentation/view/profile_screen/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'add_city_screen/add_city_screen.dart';
@@ -18,7 +17,7 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
    const AddCityScreen(),
    const SearchScreen(),
    const WeatherScreen(),
-   const ProfileScreen()
+  //  const ProfileScreen()
  ];
 
   @override
@@ -60,10 +59,10 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
           label: "Weather"
           ),
 
-          BottomNavigationBarItem(
-          icon: Icon(Icons.manage_accounts,color: Colors.white,),
-          label: "Account"
-          ),
+          // BottomNavigationBarItem(
+          // icon: Icon(Icons.manage_accounts,color: Colors.white,),
+          // label: "Account"
+          // ),
           ]
         ),
     );

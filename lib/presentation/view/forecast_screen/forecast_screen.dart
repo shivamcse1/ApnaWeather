@@ -1,4 +1,5 @@
 
+import 'package:apna_weather_app/utils/uihelper/weather_image_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -110,7 +111,7 @@ class ForecastScreenState extends State<ForecastScreen> {
                     
                                Padding(
                                  padding: const EdgeInsets.only(top: 10),
-                                 child: Image.asset("assets/images/snowy.png",
+                                 child: Image.asset(WeatherImageHelper.weatherImagePath(skyCondition:currentdata["currentWeatherData"]['weather'][0]["main"] ),
                                   width: 110.w,
                                   height: 140,
                                  ),
@@ -231,7 +232,7 @@ class ForecastScreenState extends State<ForecastScreen> {
                        SizedBox(width: 15.w,),
                        SizedBox(
                          height: 50.h,
-                         child: Image.asset("assets/icons/forecast_fewclouds_day_ic.png",
+                         child: Image.asset(WeatherImageHelper.weatherForecastImagePath(skyCondition:dailyForecasts[index]['weather'][0]['main'],hour: now.hour ),
                          
                          ),
                        ),

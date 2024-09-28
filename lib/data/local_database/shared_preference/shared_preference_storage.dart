@@ -1,37 +1,32 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LocalSharedPrefrence {
+class LocalDataBasePrefs {
 
+ late SharedPreferences localDataBasePrefs;
+ Future init() async{
+   localDataBasePrefs = await SharedPreferences.getInstance();
+ }
  
  //------------create or insert data in the local Storage-------------//
- Future<void> setData(List<String>dataList,String fieldValue) async{
-  SharedPreferences localDataBasePrefs = await SharedPreferences.getInstance() ;
-  await localDataBasePrefs.setStringList(fieldValue,dataList );
+ void setData(List<String>dataList,String keyValue){
+   localDataBasePrefs.setStringList(keyValue,dataList );
 
  }
 
-
   //------------Read data from local Storage-------------//
-
-  Future<List<String>?> getData (String fieldValue) async{
-   SharedPreferences localDataBasePrefs = await SharedPreferences.getInstance() ;
-   return localDataBasePrefs.getStringList(fieldValue);
+  List<String>? getData (String keyValue) {
+   return localDataBasePrefs.getStringList(keyValue);
   }
 
   //------------ Update Data in Local storage ------------//
   
-  Future<void> updateData (String fieldValue,List<String>dataList ) async{
-    SharedPreferences localDataBasePrefs = await SharedPreferences.getInstance();
-    await localDataBasePrefs.setStringList(fieldValue,dataList);
-
+  void updateData (String keyValue,List<String>dataList ){
+     localDataBasePrefs.setStringList(keyValue,dataList);
   }
 
   //------------ Delete Data in Local storage ------------//
-  
-  Future<void> deleteData (String fieldValue) async{
-    SharedPreferences localDataBasePrefs = await SharedPreferences.getInstance();
-    await localDataBasePrefs.remove(fieldValue);
-
+  void deleteData (String keyValue) {
+    localDataBasePrefs.remove(keyValue);
   }
 
 }

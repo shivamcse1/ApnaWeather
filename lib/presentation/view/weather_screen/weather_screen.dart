@@ -1,13 +1,17 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:apna_weather_app/core/constants/database_key_const.dart';
+import 'package:apna_weather_app/core/constants/image_const.dart';
 import 'package:apna_weather_app/data/services/current_location_service.dart';
 import 'package:apna_weather_app/core/routes/app_routes.dart';
 import 'package:apna_weather_app/data/services/api_helper/api_url_helper.dart';
 import 'package:apna_weather_app/utils/city_not_found.dart';
+import 'package:apna_weather_app/utils/uihelper/weather_image_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -21,9 +25,11 @@ class WeatherScreenState extends State<WeatherScreen> {
   bool isLatLongUsed=false;
   String placeName ='';
   dynamic argument ;
+  Map<String,dynamic> localDatabaseMap={};
 
   String cityName="";
-  bool isLocationUsed=false;
+  bool isLocationUsed = false;
+  bool isCityNameUsed = false;
 
   bool isLoading = true;
   Map<String,dynamic> currentWeatherData={};
@@ -31,7 +37,7 @@ class WeatherScreenState extends State<WeatherScreen> {
   String countryName='';
   String forecastStartTime ='';
 
-  Future<void> getCurrentWeather ({String? locationName, double? latitude, double? longitude } ) async {
+  Future<void> getCurrentWeather ({String? locationName, double? latitude, double? longitude ,bool? isCityUsed = false } ) async {
     Map<String,String> urlMap={};
     locationName==null 
     ? urlMap = ApiUrlHelper.getWeatherUrlByLatLong(lat: latitude!, long: longitude!)
@@ -48,9 +54,20 @@ class WeatherScreenState extends State<WeatherScreen> {
         if(weatherResponse.statusCode==200 && forecastResponse.statusCode==200){
            currentWeatherData = jsonDecode(weatherResponse.body);
            forecastData = jsonDecode(forecastResponse.body);
-           log('current weathr data----------$currentWeatherData');
-          //  log('5 day forecast data----------$forecastData');
            
+           //save Data in Map for Local database
+          //  if(isCityUsed==true){
+            
+          //    localDatabaseMap={
+          //     DatabaseKeyConst.minTemp :,
+          //     DatabaseKeyConst.maxTemp :,
+          //     DatabaseKeyConst.feelLikeTemp :,
+          //     DatabaseKeyConst.cloudiness :,
+          //     DatabaseKeyConst.cityName :,
+          //     DatabaseKeyConst.skyConditionImage:,
+             
+          //    };
+          //  }
            setState(() {
              isLoading=false;
              countryName =", ${currentWeatherData["sys"]["country"]}";
@@ -84,7 +101,8 @@ class WeatherScreenState extends State<WeatherScreen> {
        }
        else{
           cityName = argument;
-          getCurrentWeather(locationName: cityName);
+          isCityNameUsed = true;
+          getCurrentWeather(locationName: cityName, isCityUsed: isCityNameUsed);
        }
       
     }else if(argument is Map){
@@ -97,7 +115,7 @@ class WeatherScreenState extends State<WeatherScreen> {
     }
     else{
       cityName ="Lucknow";
-      getCurrentWeather(locationName: cityName);
+      getCurrentWeather(locationName: cityName,);
     }
     
   }
@@ -251,8 +269,9 @@ class WeatherScreenState extends State<WeatherScreen> {
                           
                           
                            SizedBox(
-                             width: 150.h,
-                             child: Image.asset("assets/images/thunderstrom.gif",
+                            height: 140.h,
+                            //  width: 150.w,
+                             child: Image.asset(WeatherImageHelper.weatherImagePath(skyCondition: currentWeatherData["weather"][0]["main"]),
                              fit: BoxFit.cover,
                              ),
                            ),
@@ -330,7 +349,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                      child: Column(
                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                        children: [
-                                         Image.asset("assets/icons/wind_day_ic.gif",height: 40.h,),
+                                         Image.asset(ImageConst.windDayIc,height: 40.h,),
                                           SizedBox(height: 8.h,),
                                          Text("${currentWeatherData["wind"]["speed"]} m/s",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Wind Speed",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
@@ -347,7 +366,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                        children: [
                                        
-                                         Image.asset("assets/icons/atomosphericpressure_ic.png",height: 40.h,),
+                                         Image.asset(ImageConst.atmPressureIc,height: 40.h,),
                                           SizedBox(height: 8.h,),
                                          Text("${currentWeatherData["main"]["pressure"]} hPa",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Atm Pressure",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
@@ -363,7 +382,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                      child: Column(
                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                        children: [
-                                          Image.asset("assets/icons/humidity_day_ic.png",height: 40.h,),
+                                          Image.asset(ImageConst.humidityDayIc,height: 40.h,),
                                           SizedBox(height: 8.h,),
                                          Text("${currentWeatherData["main"]["humidity"]}%",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Humidity",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
@@ -388,7 +407,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                      child: Column(
                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                        children: [
-                                         Image.asset("assets/icons/min_temp2_ic.png",height: 40.h,),
+                                         Image.asset(ImageConst.minTempIc,height: 40.h,),
                                           SizedBox(height: 8.h,),
                                          Text("${(currentWeatherData["main"]["temp_min"]-273.15).toStringAsFixed(2)}°C",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Min Temp.",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
@@ -404,7 +423,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                        children: [
                                        
-                                         Image.asset("assets/icons/max_temp_ic.png",height: 40.h,),
+                                         Image.asset(ImageConst.maxTempIc,height: 40.h,),
                                           SizedBox(height: 8.h,),
                                          Text("${(currentWeatherData["main"]["temp_max"]-273.15).toStringAsFixed(1)}°C",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Max Temp.",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
@@ -420,7 +439,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                      child: Column(
                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                        children: [
-                                          Image.asset("assets/icons/cloud_ic.png",height: 40.h,),
+                                          Image.asset(ImageConst.cloudImg,height: 40.h,),
                                           SizedBox(height: 8.h,),
                                          Text("${currentWeatherData["clouds"]["all"]}%",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp,color: Colors.white),),
                                          Text("Cloudiness",style: TextStyle(fontSize: 14.sp,color: Colors.white),),
@@ -483,8 +502,11 @@ class WeatherScreenState extends State<WeatherScreen> {
                         
                        forecastStartTime = forecastData['list'][index]['dt_txt'];
                        DateTime dateTime = DateTime.parse(forecastStartTime);
-
+                      
+                      
                        String currentForecastTime = DateFormat('hh:mm a').format(dateTime);
+                       int time24Format =  dateTime.hour;
+                       String weatherCondition =forecastData["list"][index]['weather'][0]['main'];
 
                        return Container(
                        padding: const EdgeInsets.only(right: 3),
@@ -504,7 +526,7 @@ class WeatherScreenState extends State<WeatherScreen> {
                                ),
                                SizedBox(height: 8.h,),
                                
-                               Icon(Icons.wb_sunny,size: 32.sp,color: Colors.orange,),
+                               Image.asset(WeatherImageHelper.weatherForecastImagePath(skyCondition: weatherCondition,hour: time24Format ),height: 32.sp),
                                SizedBox(height: 8.h,),
                                         
                                Text('${(forecastData["list"][index]['main']['temp']-273.15).toStringAsFixed(2)}°C',
