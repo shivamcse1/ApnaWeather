@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class CityNotFound{
-
- static Widget cityNotFound({String? msg="Oops! City Not Found "}){
-
+ Widget cityNotFound({String? msg="Oops! City Not Found ",double? h=650}){
     return SizedBox(
-      height: 650,
+      height: h,
       child:Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -16,7 +13,7 @@ class CityNotFound{
               height: 75,),
               SizedBox(height: 5.h,),
               Text(msg!,
-                style: TextStyle(fontSize: 18.sp,color: Colors.white,
+                style: TextStyle(fontSize: 16.sp,color: Colors.white,
                 fontWeight: FontWeight.w500
 
                 ),
@@ -26,4 +23,3 @@ class CityNotFound{
           )
         );
   }
-}

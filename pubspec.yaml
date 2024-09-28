@@ -25,6 +25,7 @@ dependencies:
   intl: ^0.19.0
   shared_preferences: ^2.2.3
   # flutter_image: ^4.1.11
+  lottie: 
 
 dev_dependencies:
   flutter_test:

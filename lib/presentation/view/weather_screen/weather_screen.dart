@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:apna_weather_app/data/services/current_location_service.dart';
 import 'package:apna_weather_app/core/routes/app_routes.dart';
-import 'package:apna_weather_app/utils/uihelper/api_url_helper.dart';
-import 'package:apna_weather_app/utils/uihelper/city_not_found_helper.dart';
+import 'package:apna_weather_app/data/services/api_helper/api_url_helper.dart';
+import 'package:apna_weather_app/utils/city_not_found.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +18,13 @@ class WeatherScreen extends StatefulWidget {
 
 class WeatherScreenState extends State<WeatherScreen> {
   DateTime now = DateTime.now();
+  bool isLatLongUsed=false;
+  String placeName ='';
+  dynamic argument ;
+
   String cityName="";
+  bool isLocationUsed=false;
+
   bool isLoading = true;
   Map<String,dynamic> currentWeatherData={};
   Map<String,dynamic> forecastData={};
@@ -28,8 +34,8 @@ class WeatherScreenState extends State<WeatherScreen> {
   Future<void> getCurrentWeather ({String? locationName, double? latitude, double? longitude } ) async {
     Map<String,String> urlMap={};
     locationName==null 
-    ? urlMap = WeatherHelper.getUrlByLatLong(lat: latitude!, long: longitude!)
-    : urlMap = WeatherHelper.getUrlByCityName(cityName:locationName);
+    ? urlMap = ApiUrlHelper.getWeatherUrlByLatLong(lat: latitude!, long: longitude!)
+    : urlMap = ApiUrlHelper.getWeatherUrlByCityName(cityName:locationName);
   
     try{
        
@@ -42,7 +48,7 @@ class WeatherScreenState extends State<WeatherScreen> {
         if(weatherResponse.statusCode==200 && forecastResponse.statusCode==200){
            currentWeatherData = jsonDecode(weatherResponse.body);
            forecastData = jsonDecode(forecastResponse.body);
-          //  log('current weathr data----------$currentWeatherData');
+           log('current weathr data----------$currentWeatherData');
           //  log('5 day forecast data----------$forecastData');
            
            setState(() {
@@ -63,14 +69,13 @@ class WeatherScreenState extends State<WeatherScreen> {
   }
 
    @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async{
     super.didChangeDependencies();
     
-    final argument = ModalRoute.of(context)?.settings.arguments;
+     argument = ModalRoute.of(context)?.settings.arguments;
     if(argument is String){
        if(argument.isEmpty)
        {
-         
           setState(() {
              cityName=argument;
              isLoading=false;
@@ -82,8 +87,16 @@ class WeatherScreenState extends State<WeatherScreen> {
           getCurrentWeather(locationName: cityName);
        }
       
-    }else{
-      cityName="Lucknow";
+    }else if(argument is Map){
+          isLatLongUsed=true;
+          placeName=argument['place_name'];
+          setState(() {
+            
+          });
+          await getCurrentWeather(latitude: argument['lat'],longitude: argument['long']);
+    }
+    else{
+      cityName ="Lucknow";
       getCurrentWeather(locationName: cityName);
     }
     
@@ -116,14 +129,17 @@ class WeatherScreenState extends State<WeatherScreen> {
               onPressed: () async{
                 setState(() {
                   isLoading=true;
+                 
                 });
                
                var data = await LocationService.getCurrentLocation();
+                isLocationUsed=true;
                data['latitude']== null 
                ? setState(() {
                  isLoading=false;
                 })
                : await getCurrentWeather(latitude: data["latitude"],longitude: data['longitude']);
+               
              }, 
              icon: const Icon(Icons.location_on,
              color: Colors.white,
@@ -132,23 +148,39 @@ class WeatherScreenState extends State<WeatherScreen> {
              backgroundColor: Colors.transparent,
              centerTitle: true,
              title:
-             cityName.isEmpty 
+             cityName.isEmpty && isLatLongUsed == false
              ? const SizedBox(height: 1,width: 1,)
 
              :
               Text(
-               currentWeatherData["name"] == null
+                //20letter
+                isLatLongUsed && isLocationUsed==false ? placeName.length <=18 ? placeName + countryName : placeName.substring(0,18)+'...' + countryName
+              
+               : currentWeatherData["name"] == null
 
                ? "${cityName[0].toUpperCase()+cityName.substring(1)}$countryName"
+               
                : "${currentWeatherData["name"][0].toUpperCase()+currentWeatherData["name"].substring(1)}$countryName",
              
              style: TextStyle(fontSize: 20.sp,color: Colors.yellow,fontWeight: FontWeight.w500),),  
 
              actions: [
 
-              currentWeatherData["cod"] == "404" || cityName.isEmpty
-              ? const SizedBox(height: 1,width: 1,)
-              : IconButton(
+              currentWeatherData["cod"] == "404" || cityName.isEmpty 
+              ? isLatLongUsed 
+              ? IconButton(
+                padding: const EdgeInsets.only(bottom: 10),
+                onPressed:() async{
+                   setState(() {
+                      isLoading=true;
+                   });
+                   getCurrentWeather(latitude: argument['lat'],longitude: argument['long']);
+              }, 
+              icon: const Icon(Icons.refresh,
+              color: Colors.white,
+              ))
+              : const SizedBox(height: 1,width: 1,)
+              :  IconButton(
                 padding: const EdgeInsets.only(bottom: 10),
                 onPressed:() async{
                    setState(() {
@@ -159,6 +191,7 @@ class WeatherScreenState extends State<WeatherScreen> {
               icon: const Icon(Icons.refresh,
               color: Colors.white,
               ))
+             
              ], 
              )
              ), 
@@ -190,9 +223,9 @@ class WeatherScreenState extends State<WeatherScreen> {
             
             :
             currentWeatherData["cod"] == "404" 
-            ? CityNotFound.cityNotFound()
-            : cityName.isEmpty 
-            ? CityNotFound.cityNotFound(msg: "Invalid City Name")
+            ? cityNotFound()
+            : cityName.isEmpty && isLatLongUsed == false 
+            ? cityNotFound(msg: "Invalid City Name")
             : Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: SingleChildScrollView(

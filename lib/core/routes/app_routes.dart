@@ -2,8 +2,9 @@ import 'package:apna_weather_app/presentation/view/add_city_screen/add_city_scre
 import 'package:apna_weather_app/presentation/view/bottom_nav_bar_screen.dart';
 import 'package:apna_weather_app/presentation/view/forecast_screen/forecast_screen.dart';
 import 'package:apna_weather_app/presentation/view/login_screen.dart';
+import 'package:apna_weather_app/presentation/view/no_data_found_screen.dart/no_data_found_screen.dart';
 import 'package:apna_weather_app/presentation/view/profile_screen/profile_screen.dart';
-import 'package:apna_weather_app/presentation/view/search_screen/search_screen.dart';
+import 'package:apna_weather_app/presentation/view/add_city_screen/add_city_search_screen.dart';
 import 'package:apna_weather_app/presentation/view/splash_screen.dart';
 import 'package:apna_weather_app/presentation/view/weather_screen/weather_screen.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class AppRoutes{
   static const String profileScreen = 'profileScreen';
   static const String addCityScreen = '/addCityScreen';
   static const String searchScreen = '/searchScreen';
+  static const String noInternetScreen ='/noInternetScreen';
 
 
   // Simpler Routing Approach mostly used for normal to medium  less complex level project
@@ -33,6 +35,7 @@ class AppRoutes{
       '/profileScreen':(context)=> const ProfileScreen(),
       '/weatherScreen' :(context)=> const WeatherScreen(),
       '/searchScreen' :(context)=> const SearchScreen(),
+      '/noInternetScreen' :(context) => const NoInternetScreen(),
     };
   
   // Dynamic Routing Approach mostly used for normal to very complex level project

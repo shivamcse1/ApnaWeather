@@ -1,3 +1,4 @@
+import 'package:apna_weather_app/presentation/view/search_screen/search_screen.dart';
 import 'package:apna_weather_app/presentation/view/weather_screen/weather_screen.dart';
 import 'package:apna_weather_app/presentation/view/profile_screen/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
  int selectedIndex =0;
  List bottomNavBarScreen =[
    const AddCityScreen(),
+   const SearchScreen(),
    const WeatherScreen(),
    const ProfileScreen()
  ];
@@ -45,7 +47,12 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
           BottomNavigationBarItem(
           icon: Icon(Icons.add_location_alt,color: Colors.white,),
-          label: "Add Location"
+          label: "Add City"
+          ),
+
+          BottomNavigationBarItem(
+          icon: Icon(Icons.search,color: Colors.white,),
+          label: "Search"
           ),
         
           BottomNavigationBarItem(

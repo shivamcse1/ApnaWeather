@@ -56,7 +56,7 @@ class AddCityScreenState extends State<AddCityScreen> {
                 children: [
                  
                   Text(
-                    "Find the city or area that you want to know the\n"
+                    "Select the city or area that you want to know the\n"
                     "detail info at this time",
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -68,39 +68,6 @@ class AddCityScreenState extends State<AddCityScreen> {
                     height: 20.h,
                   ),
 
-                //-------------Search Bar --------------//
-                Container(
-                height: 50.h,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: const Color(0xFF331868),
-                    borderRadius: BorderRadius.circular(8.sp)),
-                child: TextFormField(
-                       onFieldSubmitted: (inputValue){
-                        Navigator.pushNamed(context, AppRoutes.weatherScreen,arguments: inputValue);
-                        cityNameController.clear();
-                    },  
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(('[a-z A-Z]')))],
-                    style: TextStyle(color: Colors.white, fontSize: 14.sp),
-                    controller: cityNameController,
-                    decoration: InputDecoration(
-                    
-                      prefixIcon: const Padding(
-                        padding: EdgeInsets.only(top:3.2),
-                        child: Icon(Icons.search,color: Colors.white,),
-                      ),
-                        contentPadding:
-                            EdgeInsets.only(top: 3.0.h, left: 20.w),
-                        hintText: "Enter Your City Name",
-                        hintStyle:
-                            TextStyle(color: Colors.white, fontSize: 14.sp),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(8.0.sp))
-                            )
-                            ),
-                          ),
-                  SizedBox(height: 20.h,),
                   //-------------Card Part  --------------//
                   cityNameList.isEmpty 
                   ? SizedBox(
@@ -177,7 +144,7 @@ class AddCityScreenState extends State<AddCityScreen> {
                             width: 100,
                             child: Card(
                               margin: EdgeInsets.zero,
-                              elevation: 5,
+                              elevation: 3,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16.r)),
                               child: Container(
@@ -334,6 +301,7 @@ class AddCityScreenState extends State<AddCityScreen> {
         )
         
     );
+  
   }
 
   

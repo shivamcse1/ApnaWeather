@@ -28,7 +28,6 @@ class ForecastScreenState extends State<ForecastScreen> {
        return dateTime.contains('09:00:00'); // Filter for 9 AM forecasts
       }).toList();
 
-      print("daily forecast ------$dailyForecasts");
 
     }
   @override
