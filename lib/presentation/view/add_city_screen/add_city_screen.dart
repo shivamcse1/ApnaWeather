@@ -360,7 +360,7 @@ class AddCityScreenState extends State<AddCityScreen> with RouteAware {
                                       onTap: (){
                                         cityNameList.removeAt(index);
                                         localdatabase.updateData(keyValue: DatabaseKeyConst.cityData, dataList: cityNameList);
-                                        Toasthelper.showFlutterToast("Data Deleted Successfully");
+                                        Toasthelper.showFlutterToast("Data Deleted Successfully!");
                                         setState(() {
                                           
                                         });    
