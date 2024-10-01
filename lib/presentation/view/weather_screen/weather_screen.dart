@@ -90,9 +90,14 @@ class WeatherScreenState extends State<WeatherScreen> {
       argument = ModalRoute.of(context)?.settings.arguments;
      if(argument is String){
       cityName = argument;
-      isCityNameUsed = true;
-      await getCurrentWeather(locationName: cityName, isCityUsed: isCityNameUsed);
-    
+     
+      if(isCityNameUsed == false)  {
+       isCityNameUsed = true ;
+       await getCurrentWeather(locationName: cityName, isCityUsed: isCityNameUsed);
+      }
+      else{
+       await getCurrentWeather(locationName: cityName);
+      }
     }
     else if(argument is Map){
            

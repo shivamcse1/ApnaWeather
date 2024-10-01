@@ -358,6 +358,8 @@ class AddCityScreenState extends State<AddCityScreen> with RouteAware {
                                       PopupMenuItem(
                                     
                                       onTap: (){
+                                        cityNameList.removeAt(index);
+                                        localdatabase.updateData(keyValue: DatabaseKeyConst.cityData, dataList: cityNameList);
                                         Toasthelper.showFlutterToast("Data Deleted Successfully");
                                         setState(() {
                                           

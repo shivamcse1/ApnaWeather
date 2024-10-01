@@ -11,8 +11,8 @@ class Toasthelper {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 2,
-        backgroundColor: const Color(0xFF331868),
-        textColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 202, 210, 208),
+        textColor: Colors.black,
         fontSize: 16.0,
         
     );

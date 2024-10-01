@@ -88,7 +88,7 @@ class SearchScreenState extends State<SearchScreen> {
 
                           // imediately move in next screen
                           Navigator.pushReplacementNamed(context, AppRoutes.weatherScreen,arguments: inputValue.trim()),
-                         cityNameController.clear() 
+                          cityNameController.clear() 
                         };
                     },  
                     inputFormatters: [FilteringTextInputFormatter.allow(RegExp(('[a-z A-Z]')))],
