@@ -26,6 +26,8 @@ dependencies:
   shared_preferences: ^2.2.3
   # flutter_image: ^4.1.11
   lottie: 
+  google_maps_flutter: ^2.6.1
+  
 
 dev_dependencies:
   flutter_test:

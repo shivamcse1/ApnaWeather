@@ -7,23 +7,27 @@ class LocationService{
     Map<String,double> latLongMap={};
     double long=0;
     double lat=0;
+    
      // check device location enable or not 
     bool serviceEnable ;
     serviceEnable = await Geolocator.isLocationServiceEnabled();
     if(!serviceEnable){
-      Toasthelper.showFlutterToast("Please Turn On Location");
-       await Geolocator.openLocationSettings();
+       Toasthelper.showFlutterToast("Please Turn On Location");
+      //  futureawait Geolocator.openLocationSettings();
        return latLongMap;
     }
     
     //if enable then proceed 
     LocationPermission permission = await Geolocator.checkPermission();
     if(permission == LocationPermission.denied){
-         
-        Toasthelper.showFlutterToast("Denied Location Permisison!");
+
         LocationPermission askAgain = await Geolocator.requestPermission();
-        if(askAgain==LocationPermission.denied || askAgain==LocationPermission.deniedForever ){
-          Toasthelper.showFlutterToast("Location Permisison Denied Forever!");
+        if(askAgain == LocationPermission.unableToDetermine){
+          Toasthelper.showFlutterToast("Unable To Deteremine Location!");
+          return latLongMap;
+        }
+        else if(askAgain==LocationPermission.denied || askAgain==LocationPermission.deniedForever ){
+          Toasthelper.showFlutterToast("Location Permisison Denied");
           return latLongMap;
         }
         else{
@@ -39,7 +43,7 @@ class LocationService{
         }
     }
     else if(permission ==LocationPermission.deniedForever){
-      Toasthelper.showFlutterToast("Location Permisison Denied Forever!");
+      Toasthelper.showFlutterToast("Permisison Denied Forever!");
       return latLongMap;
     }
     else{
@@ -51,8 +55,7 @@ class LocationService{
      "latitude":lat,
      "longitude":long
      };
+     return latLongMap;
     }
-   return latLongMap;
-
   }
 }

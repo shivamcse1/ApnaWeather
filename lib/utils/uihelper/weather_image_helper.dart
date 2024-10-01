@@ -1,27 +1,21 @@
-import 'dart:math';
 
 import 'package:apna_weather_app/core/constants/image_const.dart';
 
 class WeatherImageHelper{
-   static Random random = Random();
   // weather Image Path Provider Function
   static String weatherImagePath({  String skyCondition = "Clear" }){
     DateTime now = DateTime.now();
     int hour = now.hour;
-    List<String> cloudDay=[
-      ImageConst.fewCloudsDayImg,
-      ImageConst.cloudImg,
-    ];
 
     switch(skyCondition){
        case 'Clear':
-        if(hour<19 && hour >5) { return ImageConst.cloudImg; } 
+        if(hour<19 && hour >5) { return ImageConst.clearSkyDayImg; } 
         else { return ImageConst.clearSkyNightImg; }
        
        case  'Clouds':
         if(hour<19 && hour >5)
-          { int randomIndex = random.nextInt(cloudDay.length);
-            return cloudDay[randomIndex] ; } 
+          { 
+            return ImageConst.fewCloudsDayImg; } 
         else { return ImageConst.fewCloudsNightImg ;}
 
        case  'Haze':

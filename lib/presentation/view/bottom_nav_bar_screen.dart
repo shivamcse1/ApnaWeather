@@ -26,11 +26,11 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
         body: bottomNavBarScreen[selectedIndex] ,
 
         bottomNavigationBar:  BottomNavigationBar(
-
+        iconSize: 22,
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.white,
-        unselectedLabelStyle: const TextStyle(fontSize: 15),
-        selectedLabelStyle: const TextStyle(fontSize: 15),
+        unselectedLabelStyle: const TextStyle(fontSize: 12),
+        selectedLabelStyle: const TextStyle(fontSize: 12),
         
         
         currentIndex: selectedIndex,

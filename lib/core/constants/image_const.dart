@@ -39,6 +39,8 @@ class ImageConst{
   static const String noInternet2Img = 'assets/images/no_internet.webp';
   static const String noCityFoundImg = 'assets/images/nocity_found.png';
   static const String noCityFound2Img = 'assets/images/nocity_found2.png';
+  static const String splashImg = 'assets/images/splash.png';
+
 
 
 

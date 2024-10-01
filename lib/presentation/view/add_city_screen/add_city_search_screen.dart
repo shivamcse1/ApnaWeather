@@ -82,39 +82,14 @@ class SearchScreenState extends State<SearchScreen> {
                       inputValue.isEmpty 
                       ?  Toasthelper.showFlutterToast("Please Enter City Name")
                      
-                      : showDialog(context: context, 
-                          builder: (context){
-                            return AlertDialog(
-                              title: Text("Do You Want To Add City",
-                              style: TextStyle(fontSize: 15.sp)
-                              ),
-                              actionsPadding: const EdgeInsets.only(bottom: 5,right: 15),
-                            actions: [
+                      : {
+                          //Passing Data to previous Screen
+                          // Navigator.pop(context, inputValue.trim()),
 
-                           TextButton(
-                            onPressed:(){
-                             Navigator.pop(context);
-                             Navigator.pop(context);
-                             Navigator.pushNamed(context, AppRoutes.weatherScreen,arguments: inputValue);
-                             
-                            }, 
-                            child: Text("No",style: TextStyle(fontSize: 15.sp),)
-                            ),
-                          
-                           TextButton(
-                            onPressed:() {
-
-                              Navigator.pop(context);
-                              Navigator.pop(context, inputValue);
-                              Navigator.pushNamed(context, AppRoutes.weatherScreen,arguments: inputValue);
-                            }, 
-                            child: Text("Yes",style: TextStyle(fontSize: 15.sp),)
-                          ),
-                          ],
-                        );
-                       });
-
-                        cityNameController.clear();
+                          // imediately move in next screen
+                          Navigator.pushReplacementNamed(context, AppRoutes.weatherScreen,arguments: inputValue.trim()),
+                         cityNameController.clear() 
+                        };
                     },  
                     inputFormatters: [FilteringTextInputFormatter.allow(RegExp(('[a-z A-Z]')))],
                     style: TextStyle(color: Colors.white, fontSize: 14.sp),
@@ -156,46 +131,11 @@ class SearchScreenState extends State<SearchScreen> {
                  itemBuilder: (context,index){
                   return GestureDetector(
                     onTap: () {
+                    //Passing Data to previous Screen
+                   // Navigator.pop(context, topCity[index].trim());
 
-                      showDialog(context: context, 
-                      builder: (context){
-                        return AlertDialog(
-                          title: Text("Do You Want To Add City",
-                          style: TextStyle(fontSize: 15.sp)
-                          ),
-                          actionsPadding: const EdgeInsets.only(bottom: 5,right: 15),
-                          actions: [
-
-                           TextButton(
-                            onPressed:(){
-                            //1st pop to current screen
-                             Navigator.pop(context);
-
-                            //2nd pop to previous screen
-                             Navigator.pop(context);
-                             Navigator.pushNamed(context, AppRoutes.weatherScreen,arguments: topCity[index].trim());
-                             
-                            }, 
-                            child: Text("No",style: TextStyle(fontSize: 15.sp),)
-                            ),
-                          
-                           TextButton(
-                            onPressed:() {
-                              
-                              //pop to current screen
-                              Navigator.pop(context,);
-
-                              //Passing Data to previous Screen
-                              Navigator.pop(context, topCity[index].trim());
-
-                               // imediately move in next screen
-                              Navigator.pushNamed(context, AppRoutes.weatherScreen,arguments: topCity[index].trim());
-                            }, 
-                            child: Text("Yes",style: TextStyle(fontSize: 15.sp),)
-                          ),
-                          ],
-                        );
-                       });
+                    // imediately move in next screen
+                    Navigator.pushReplacementNamed(context, AppRoutes.weatherScreen,arguments: topCity[index].trim());
                     },
                     child: Container(
                       decoration: BoxDecoration(

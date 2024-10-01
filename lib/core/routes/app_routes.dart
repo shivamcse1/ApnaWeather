@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 class AppRoutes{
 
   // App Screen Name
-  static const String bottomNavScreen = '/';
-  static const String splashScreen = '/splashScreen';
+  static const String splashScreen = '/';
+  static const String bottomNavScreen = '/bottomNavScreen';
   static const String loginScreen = '/loginScreen';
   static const String forecastScreen = '/forecastScreen';
   static const String weatherScreen = '/weatherScreen';
@@ -27,8 +27,8 @@ class AppRoutes{
 
   static final Map<String,WidgetBuilder> routes =
      {
-      '/' : (context)=> const BottomNavBarScreen(),
-      '/splashScreen':(context) => const SplashScreen(),
+      '/':(context) => const SplashScreen(),
+      '/bottomNavScreen' : (context)=> const BottomNavBarScreen(),
       '/loginScreen' :(context)=> const LoginScreen(),
       '/addCityScreen' :(context)=> const AddCityScreen(),
       '/forecastScreen' :(context)=> const ForecastScreen(),
@@ -42,42 +42,43 @@ class AppRoutes{
   
   // we can use any of them but we can use first because all things can be handle 
   
-  static Route<dynamic> generateRoute (RouteSettings setting){
+  // static Route<dynamic> generateRoute (RouteSettings setting){
 
-    switch(setting.name){
+  //   switch(setting.name){
 
-      case bottomNavScreen:
-      return MaterialPageRoute(builder: (context) =>const BottomNavBarScreen());
+  //     case bottomNavScreen:
+  //     return MaterialPageRoute(builder: (context) =>const BottomNavBarScreen());
 
-      case splashScreen:
-      return MaterialPageRoute(builder: (context) =>const SplashScreen());
+  //     case splashScreen:
+  //     return MaterialPageRoute(builder: (context) =>const SplashScreen());
 
-      case loginScreen:
-      return MaterialPageRoute(builder: (context) =>const LoginScreen());
+  //     case loginScreen:
+  //     return MaterialPageRoute(builder: (context) =>const LoginScreen());
 
-      case forecastScreen:
-      return MaterialPageRoute(builder: (context) =>const ForecastScreen());
+  //     case forecastScreen:
+  //     return MaterialPageRoute(builder: (context) =>const ForecastScreen());
 
-      case weatherScreen:
-      return MaterialPageRoute(builder: (context) =>const WeatherScreen());
+  //     case weatherScreen:
+  //     return MaterialPageRoute(builder: (context) =>const WeatherScreen());
 
-      case profileScreen:
-      return MaterialPageRoute(builder: (context) =>const ProfileScreen());
+  //     case profileScreen:
+  //     return MaterialPageRoute(builder: (context) =>const ProfileScreen());
 
-      case addCityScreen:
-      return MaterialPageRoute(builder: (context) =>const AddCityScreen());
+  //     case addCityScreen:
+  //     return MaterialPageRoute(builder: (context) =>const AddCityScreen());
 
-      case searchScreen:
-      return MaterialPageRoute(builder: (context) =>const SearchScreen());
+  //     case searchScreen:
+  //     return MaterialPageRoute(builder: (context) =>const SearchScreen());
 
-      default :
+  //     default :
       
-      return MaterialPageRoute(builder: (context) {
+  //     return MaterialPageRoute(builder: (context) {
 
-        return const Scaffold(
-          body: Text("no route defined"),
-        );
-       }); 
-    }
-  }
+  //       return const Scaffold(
+  //         body: Text("no route defined"),
+  //       );
+  //      }); 
+  //   }
+  // }
+
 }
