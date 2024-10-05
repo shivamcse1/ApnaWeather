@@ -17,9 +17,9 @@ samples, guidance on mobile development, and a full API reference.
 
 ##App Screenshot
 <p>
-    <img src = 'assets/screenshot/s1.png' width=200>
-    <img src = 'assets/screenshot/s2.png' width=200>
-    <img src = 'assets/screenshot/s3.png' width=200>
+    <img src = 'assets/screenshot/s1.png' width=190>
+    <img src = 'assets/screenshot/s2.png' width=190>
+    <img src = 'assets/screenshot/s3.png' width=190>
 </p>
 
 
@@ -31,9 +31,9 @@ samples, guidance on mobile development, and a full API reference.
 
 
 <p>
-    <img src = 'assets/screenshot/s7.png' width=200>
-    <img src = 'assets/screenshot/s8.png' width=200>
-    <img src = 'assets/screenshot/s9.png' width=200>
+    <img src = 'assets/screenshot/s7.png' width=190>
+    <img src = 'assets/screenshot/s8.png' width=190>
+    <img src = 'assets/screenshot/s9.png' width=190>
 </p>
 
 <img src = 'assets/screenshot/s10.png' width=200>
