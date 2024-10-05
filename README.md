@@ -40,3 +40,10 @@ samples, guidance on mobile development, and a full API reference.
   <img src = 'assets/screenshot/s11.png' width=190>
 </p>
 
+## For Runing In Your System
+<h3> Follow these Steps </h3>
+
+Step 1. git clone <copy this repository path>
+Step 2. flutter pub get 
+Step 3. flutter run
+
