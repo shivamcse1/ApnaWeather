@@ -1,4 +1,3 @@
-import 'package:apna_weather_app/utils/circular_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -157,9 +156,7 @@ class LoginScreenState extends State<LoginScreen> {
                   )
                 ),
                 onPressed: (){
-                //  Navigator.push(context, MaterialPageRoute(builder: (context){
-                //   return const ForgotPasswordScreen();
-                // }));
+              
                 },
                 child:Text("Login",
                 style: TextStyle(fontSize: 16.sp,fontWeight: FontWeight.w500,color: Colors.white),) 
