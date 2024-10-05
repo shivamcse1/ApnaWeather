@@ -14,7 +14,6 @@ class SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    // Todo:
     super.initState();
 
     Timer(const Duration(seconds: 5),()
