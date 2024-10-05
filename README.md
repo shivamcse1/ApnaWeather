@@ -24,9 +24,9 @@ samples, guidance on mobile development, and a full API reference.
 
 
 <p>
-    <img src = 'assets/screenshot/s4.png' width=200>
-    <img src = 'assets/screenshot/s5.png' width=200>
-    <img src = 'assets/screenshot/s6.png' width=200>
+    <img src = 'assets/screenshot/s4.png' width=190>
+    <img src = 'assets/screenshot/s5.png' width=190>
+    <img src = 'assets/screenshot/s6.png' width=190>
 </p>
 
 
